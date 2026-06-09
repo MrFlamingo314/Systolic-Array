@@ -20,30 +20,46 @@ module systolic_array_tb #(parameter N=4) ();
     initial begin
         $dumpfile("wave.vcd");
         $dumpvars(0, systolic_array_tb);
+
         rst_n = 0;
         #10 rst_n = 1;
-
-        for (int i = 0; i < N; i++)
-            for (int j = 0; j < N; j++) begin
-                i_mat_a[i][j] = i + j;
-                i_mat_b[i][j] = (i == j) ? 1 : 0;
-            end
-
-        #200;
-
-        $display("Calculated:");
-        for (int i = 0; i < N; i++) begin
-            for (int j = 0; j < N; j++) $write("%0d ", o_mat[i][j]);
-            $write("\n");
+        for (int i = 0; i < 10; i++) begin
+            random_test();
+            #(30*N+20); // Wait for the computation to complete
         end
-
-        for (int i = 0; i < N; i++)
-            for (int j = 0; j < N; j++)
-                assert(o_mat[i][j] == i_mat_a[i][j])
-                    else $error("Mismatch [%0d][%0d]: expected %0d got %0d",
-                                i, j, i_mat_a[i][j], o_mat[i][j]);
-
-        $display("Test completed!");
+        
         $finish;
     end
 endmodule
+
+task automatic compare(mat_a, mat_b, mat_o);
+
+    input logic signed [31:0] mat_a [N-1:0][N-1:0];
+    input logic signed [31:0] mat_b [N-1:0][N-1:0];
+    input logic signed [31:0] mat_o [N-1:0][N-1:0];
+
+    for (int i = 0; i < N; i++)
+        for (int j = 0; j < N; j++) begin
+            logic signed [31:0] expected = 0;
+            for (int k = 0; k < N; k++)
+                expected += mat_a[i][k] * mat_b[k][j];
+            assert(mat_o[i][j] == expected)
+                else $error("Mismatch [%0d][%0d]: expected %0d got %0d",
+                            i, j, expected, mat_o[i][j]);
+        end
+    
+endtask
+    
+task automatic random_test();
+    logic signed [31:0] mat_a [N-1:0][N-1:0];
+    logic signed [31:0] mat_b [N-1:0][N-1:0];
+    logic signed [31:0] mat_o [N-1:0][N-1:0];
+
+    $display(list_of_arguments)
+    for (int i = 0; i < N; i++)
+        for (int j = 0; j < N; j++) begin
+            mat_a[i][j] = $random;
+            mat_b[i][j] = $random;
+        end
+
+    compare(mat_a, mat_b, mat_c);
