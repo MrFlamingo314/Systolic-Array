@@ -27,7 +27,7 @@ module systolic_array #(parameter N=4) (clk, rst_n, i_mat_a, i_mat_b, o_mat);
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n)
             ticks <= 0;
-        else if (ticks < 2*N-2) 
+        else if (ticks < 2*N-1) 
             ticks <= ticks + 1;
     end
 
