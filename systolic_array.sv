@@ -54,7 +54,7 @@ module systolic_array #(parameter N=4) (clk, rst_n, i_mat_a, i_mat_b, o_mat);
                     .rst_n(rst_n),
                     .o_a(a_wire[i][j]),
                     .o_b(b_wire[i][j]),
-                    .o_sum(o_mat[i][j])
+                    .o_sum(o_mat[j][i])
                 );
             end
         end
